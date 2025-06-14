@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="texte" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6334 2291">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #f2f0ce;
+      }
+
+      .cls-2 {
+        fill: #f27c38;
+      }
+
+      .cls-3 {
+        fill: #f2b56b;
+      }
+
+      .cls-4 {
+        fill: #a6764c;
+        font-family: VT323-Regular, VT323;
+        font-size: 1296px;
+      }
+    </style>
+  </defs>
+  <g>
+    <rect class="cls-1" x="5.33" y="4.42" width="6324" height="2283"/>
+    <path class="cls-3" d="M6003.78,330.47v1630.9H330.89V330.47h5672.9M6157.33,176.92H177.33v1938h5980V176.92h0Z"/>
+    <path class="cls-2" d="M6157.95,175.8v1940.23H176.72V175.8h5981.23M6329.33,4.42H5.33v2283h6324V4.42h0Z"/>
+  </g>
+  <text class="cls-4" transform="translate(1871.35 1495.83)"><tspan x="0" y="0">Start</tspan></text>
+</svg>

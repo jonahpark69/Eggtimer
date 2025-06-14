@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="bouton_fermer_la_fenétre" data-name="bouton fermer la fenétre" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #f2f0ce;
+      }
+
+      .cls-2 {
+        fill: #a6764c;
+      }
+
+      .cls-3 {
+        fill: #f27c38;
+      }
+
+      .cls-4 {
+        fill: #f2b56b;
+      }
+    </style>
+  </defs>
+  <rect class="cls-1" x="60.5" y="60" width="679" height="679"/>
+  <path class="cls-3" d="M733,67v666H67V67h666M800,0H0v800h800V0h0Z"/>
+  <path class="cls-4" d="M663,138v525H138V138h525M733,68H68v665h665V68h0Z"/>
+  <g>
+    <rect class="cls-2" x="363.39" y="364" width="73.23" height="73.23"/>
+    <rect class="cls-2" x="435.38" y="436" width="73.23" height="73.23"/>
+    <rect class="cls-2" x="508.61" y="509.23" width="73.23" height="73.23"/>
+    <rect class="cls-2" x="292" y="435.38" width="73.23" height="73.23"/>
+    <rect class="cls-2" x="218.77" y="508.61" width="73.23" height="73.23"/>
+    <rect class="cls-2" x="290.16" y="290.77" width="73.23" height="73.23"/>
+    <rect class="cls-2" x="216.93" y="217.54" width="73.23" height="73.23"/>
+    <rect class="cls-2" x="436.61" y="290.77" width="73.23" height="73.23"/>
+    <rect class="cls-2" x="509.84" y="217.54" width="73.23" height="73.23"/>
+  </g>
+</svg>

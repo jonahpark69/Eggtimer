@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="bouton_réduire" data-name="bouton réduire" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #f2f0ce;
+      }
+
+      .cls-2 {
+        fill: none;
+        stroke: #a6764c;
+        stroke-miterlimit: 10;
+        stroke-width: 67px;
+      }
+
+      .cls-3 {
+        fill: #f27c38;
+      }
+
+      .cls-4 {
+        fill: #f2b56b;
+      }
+    </style>
+  </defs>
+  <rect class="cls-1" x="61" y="60" width="679" height="679"/>
+  <path class="cls-3" d="M733,67v666H67V67h666M800,0H0v800h800V0h0Z"/>
+  <path class="cls-4" d="M669.5,130.5v539H130.5V130.5h539M739.5,60.5H60.5v679h679V60.5h0Z"/>
+  <line class="cls-2" x1="182.5" y1="588.5" x2="617.5" y2="588.5"/>
+</svg>

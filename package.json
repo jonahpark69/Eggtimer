@@ -1,0 +1,12 @@
+{
+  "name": "egg-timer",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "description": "Une application Egg Timer avec interface pixel art"
+}
