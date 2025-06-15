@@ -2,11 +2,18 @@
   "name": "egg-timer",
   "version": "1.0.0",
   "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  },
-  "keywords": [],
+  "description": "Une application Egg Timer avec interface pixel art",
   "author": "",
   "license": "MIT",
-  "description": "Une application Egg Timer avec interface pixel art"
+  "keywords": [],
+  "scripts": {
+    "start": "electron .",
+    "package-win": "electron-packager . EggTimer --platform=win32 --arch=ia32 --overwrite --no-app-version --no-copyright"
+  },
+  
+  "devDependencies": {
+    "electron-packager": "^17.1.2"
+  }
 }
+
+
