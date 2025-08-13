@@ -496,5 +496,15 @@ body {
 .modal-actions button:hover { transform: scale(1.05); box-shadow:3px 3px 0 #000; }
 .modal-actions button:active { transform: scale(0.95); box-shadow:1px 1px 0 #000; }
 
+/* Curseur pointeur sur le minuteur */
+#timer-display {
+  cursor: pointer;
+}
+
+#timer-display:hover {
+  color: #ffb400; /* Exemple : jaune doré */
+  transform: scale(1.05);
+  transition: transform 0.2s ease, color 0.2s ease;
+}
 
 
