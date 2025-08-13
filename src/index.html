@@ -7,16 +7,34 @@
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- Barre de titre / fenêtres -->
-  <div class="header-bar">
-    <h1 class="title">Egg Timer ^^</h1>
-    <div class="window-buttons">
-      <img src="../assets/svg/Bouton-reduire.svg" alt="Minimize" class="btn-svg" id="btn-minimize">
-      <img src="../assets/svg/Bouton-fermer.svg" alt="Close" class="btn-svg" id="btn-close">
-    </div>
-  </div>
+ <div class="header-bar">
+  <h1 class="title">Egg Timer ^^</h1>
+  <div class="window-buttons">
 
-  <!-- Page d'accueil -->
+    <!-- 🔙 Flèche pixelisée (retour au menu) — cachée par défaut -->
+    <svg id="btn-back-menu" class="btn-svg hidden"
+         xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+         viewBox="0 0 16 16" shape-rendering="crispEdges"
+         role="img" aria-label="Retour" style="cursor:pointer;">
+      <!-- Fond transparent -->
+      <rect width="16" height="16" fill="none"/>
+      <!-- Flèche pixelisée -->
+      <rect x="8" y="3" width="2" height="2" fill="#e57c30"/>
+      <rect x="6" y="5" width="2" height="2" fill="#e57c30"/>
+      <rect x="4" y="7" width="2" height="2" fill="#e57c30"/>
+      <rect x="6" y="9" width="2" height="2" fill="#e57c30"/>
+      <rect x="8" y="11" width="2" height="2" fill="#e57c30"/>
+      <!-- Barre horizontale au centre -->
+      <rect x="8" y="7" width="5" height="2" fill="#e57c30"/>
+    </svg>
+
+    <!-- Boutons système -->
+    <img src="../assets/svg/Bouton-reduire.svg" alt="Minimize" class="btn-svg" id="btn-minimize">
+    <img src="../assets/svg/Bouton-fermer.svg"  alt="Close" class="btn-svg" id="btn-close">
+  </div>
+</div>
+
+
   <section id="page-start" class="page visible">
     <p class="slogan">Ton œuf, ton style, ton timing !</p>
 
@@ -26,7 +44,6 @@
     </div>
   </section>
 
-  <!-- Menu de sélection -->
   <section id="page-menu" class="page hidden">
     <div class="menu-wrapper">
       <img src="../assets/img/img-background-egg-timer.png" alt="Fond" class="menu-background">
@@ -56,7 +73,6 @@
     </div>
   </section>
 
-  <!-- Page minuteur -->
   <section id="page-timer" class="page hidden">
     <div class="timer-wrapper">
       <img src="../assets/img/img-background-egg-timer.png" alt="Fond" class="timer-background">
@@ -65,13 +81,13 @@
         <p class="timer-text">Ton œuf est prêt dans...</p>
 
         <div class="timer-egg-container">
-          <img id="timer-egg" class="timer-egg" alt="Animation cuisson" />
+          <img id="timer-egg" class="timer-egg" />
         </div>
 
         <!-- 📌 Contrôles -->
-        <button id="btn-pause" type="button" class="pause-btn" aria-label="Pause">⏸</button>
-        <p class="timer-countdown" id="timer-display" aria-live="polite">7:00</p>
-        <button id="btn-reset" type="button" class="reset-btn" aria-label="Réinitialiser">⟳</button>
+        <button id="btn-pause" type="button" class="pause-btn">⏸</button>
+        <p class="timer-countdown" id="timer-display">7:00</p>
+        <button id="btn-reset" type="button" class="reset-btn">⟳</button>
 
         <!-- 📌 Modale durée personnalisée -->
         <div id="modal-custom-time" class="modal hidden" aria-hidden="true">
@@ -96,7 +112,6 @@
     </div>
   </section>
 
-  <!-- Page fin -->
   <section id="page-end" class="page hidden">
     <div class="timer-wrapper page-end-wrapper">
       <img src="../assets/img/img-background-egg-timer.png" alt="Fond" class="timer-background">
@@ -114,38 +129,15 @@
             <img src="../assets/svg/Bouton-fermer-2.svg" id="btn-restart-app" class="end-btn-img" alt="Fermer">
           </div>
         </div>
+
       </div>
-    </div>
-  </section>
-
-  <!-- Page réglages : durées personnalisées (utilisée pour l'autosave localStorage) -->
-  <section id="page-durees" class="page hidden">
-    <div class="settings-wrapper">
-      <h2>Durées personnalisées</h2>
-
-      <div class="durations-grid">
-        <label>À la coque
-          <input class="duration-input" data-type="coque" type="text" inputmode="numeric" placeholder="mm:ss" />
-        </label>
-        <label>Mollet
-          <input class="duration-input" data-type="mollet" type="text" inputmode="numeric" placeholder="mm:ss" />
-        </label>
-        <label>Au plat
-          <input class="duration-input" data-type="plat" type="text" inputmode="numeric" placeholder="mm:ss" />
-        </label>
-        <label>Dur
-          <input class="duration-input" data-type="dur" type="text" inputmode="numeric" placeholder="mm:ss" />
-        </label>
-      </div>
-
-      <button id="btn-reset-durations" type="button" class="btn-reset-durations">Réinitialiser les durées</button>
-      <p class="hint">Format accepté : <code>mm:ss</code> (ex. 06:30)</p>
     </div>
   </section>
 
   <script src="renderer.js"></script>
 </body>
 </html>
+
 
 
 

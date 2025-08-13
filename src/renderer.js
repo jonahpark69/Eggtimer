@@ -17,54 +17,38 @@ let isPaused = false;
 
 /* ============================
    🔒 Sauvegarde des durées
-   - Stockage par type (coque, mollet, plat, dur)
-   - Restauration automatique au lancement
-   - Sauvegarde automatique quand tu valides la modale
 ============================= */
 const LS_KEY_DURATIONS = 'eggTimer:durations';
-
-// Valeurs par défaut (reprend tes réglages initiaux)
 const DEFAULT_DURATIONS = { coque: 210, mollet: 300, plat: 240, dur: 420 };
-
-// Cache en mémoire (évite de relire à chaque clic)
 let CACHED_DURATIONS = null;
 
 function loadDurations() {
   if (CACHED_DURATIONS) return CACHED_DURATIONS;
   try {
     const raw = localStorage.getItem(LS_KEY_DURATIONS);
-    if (!raw) {
-      CACHED_DURATIONS = { ...DEFAULT_DURATIONS };
-      return CACHED_DURATIONS;
-    }
+    if (!raw) return CACHED_DURATIONS = { ...DEFAULT_DURATIONS };
     const parsed = JSON.parse(raw);
     const merged = { ...DEFAULT_DURATIONS };
     Object.keys(parsed || {}).forEach(k => {
       const v = Number(parsed[k]);
       if (Number.isFinite(v) && v > 0) merged[k] = v;
     });
-    CACHED_DURATIONS = merged;
-    return CACHED_DURATIONS;
+    return CACHED_DURATIONS = merged;
   } catch {
-    CACHED_DURATIONS = { ...DEFAULT_DURATIONS };
-    return CACHED_DURATIONS;
+    return CACHED_DURATIONS = { ...DEFAULT_DURATIONS };
   }
 }
-
 function saveDurationsMap(map) {
   CACHED_DURATIONS = { ...map };
   localStorage.setItem(LS_KEY_DURATIONS, JSON.stringify(CACHED_DURATIONS));
 }
-
 function getDurationFor(type) {
   const map = loadDurations();
   const val = map[type];
   return Number.isFinite(val) && val > 0 ? val : (DEFAULT_DURATIONS[type] || 300);
 }
-
 function saveDurationForType(type, seconds) {
-  if (!type) return;
-  if (!Number.isFinite(seconds) || seconds <= 0) return;
+  if (!type || !Number.isFinite(seconds) || seconds <= 0) return;
   const map = loadDurations();
   map[type] = Math.floor(seconds);
   saveDurationsMap(map);
@@ -74,27 +58,18 @@ function saveDurationForType(type, seconds) {
 /*    ⏱️ Timer     */
 /* =============== */
 function startTimer(durationInSeconds, onEndCallback) {
-  if (currentInterval) {
-    clearInterval(currentInterval);
-    currentInterval = null;
-  }
+  if (currentInterval) clearInterval(currentInterval);
   remainingSeconds = durationInSeconds;
   sessionInitialSeconds = durationInSeconds;
   isPaused = false;
-
   const btnPause = document.getElementById('btn-pause');
   if (btnPause) btnPause.textContent = '⏸';
-
   const timerDisplay = document.getElementById('timer-display');
-
   const updateDisplay = () => {
     const minutes = Math.floor(Math.max(0, remainingSeconds) / 60);
     const seconds = Math.max(0, remainingSeconds) % 60;
-    if (timerDisplay) {
-      timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-    }
+    if (timerDisplay) timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
-
   updateDisplay();
   currentInterval = setInterval(() => {
     if (isPaused) return;
@@ -112,7 +87,6 @@ function startTimer(durationInSeconds, onEndCallback) {
 /*     🚀 Initialisation UI        */
 /* =============================== */
 window.addEventListener('DOMContentLoaded', () => {
-  // Toujours charger en mémoire les durées au boot
   loadDurations();
 
   const btnStart = document.getElementById('btn-start');
@@ -123,9 +97,8 @@ window.addEventListener('DOMContentLoaded', () => {
   const timerEgg = document.getElementById('timer-egg');
   const endEgg = document.getElementById('end-egg');
 
-  // ▶️ Page de démarrage
+  // ▶️ Bouton démarrage
   btnStart?.addEventListener('click', () => {
-    soundStart.currentTime = 0;
     soundStart.play();
     pageStart.classList.replace('visible', 'hidden');
     pageMenu.classList.replace('hidden', 'visible');
@@ -133,86 +106,60 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // 🔁 Fermer depuis la page de fin
   document.getElementById('btn-restart-app')?.addEventListener('click', () => {
-    soundClose.currentTime = 0;
     soundClose.play();
     resetApp();
+    hideBackButton();
   });
 
   // 🥚 Sélection d'un œuf
   const cuissonOptions = document.querySelectorAll('.egg-option');
-
   cuissonOptions.forEach(option => {
     option.addEventListener('click', () => {
-      eggClickSound.currentTime = 0;
       eggClickSound.play();
-
-      const type = option.id.replace('cuisson-', ''); // coque | mollet | plat | dur
+      const type = option.id.replace('cuisson-', '');
       selectedType = type;
-
-      // Musique de cuisson par type
-      if (cookingMusic) { cookingMusic.pause(); cookingMusic.currentTime = 0; }
+      if (cookingMusic) cookingMusic.pause();
       cookingMusic = new Audio(`sounds/music-${type}.mp3`);
       cookingMusic.loop = true;
       cookingMusic.volume = 0.5;
-      cookingMusic.play().catch(() => { /* ignore autoplay issues */ });
-
-      // Animation correspondante
-      if (timerEgg) {
-        timerEgg.src = `gifs/animation-${type}.gif?${Date.now()}`;
-      }
-
-      // Navigation Menu -> Timer
+      cookingMusic.play().catch(()=>{});
+      if (timerEgg) timerEgg.src = `gifs/animation-${type}.gif?${Date.now()}`;
       pageMenu.classList.replace('visible', 'hidden');
       pageTimer.classList.replace('hidden', 'visible');
-
-      // ⏱️ Durée pour ce type (localStorage → sinon défaut)
-      const durationSec = getDurationFor(type);
-
-      // Démarre le timer
-      startTimer(durationSec, () => {
-        if (cookingMusic) { cookingMusic.pause(); cookingMusic.currentTime = 0; }
+      showBackButton(); // 👈 Affiche la flèche
+      startTimer(getDurationFor(type), () => {
+        if (cookingMusic) cookingMusic.pause();
         softAlarm = new Audio('sounds/egg-ready.wav');
         softAlarm.volume = 0.6;
-        softAlarm.play().catch(() => {});
-
+        softAlarm.play().catch(()=>{});
         if (endEgg) {
           endEgg.src = `img/egg-final-${selectedType}.png?${Date.now()}`;
           endEgg.classList.add('vibrate');
         }
-
         pageTimer.classList.replace('visible', 'hidden');
         pageEnd.classList.replace('hidden', 'visible');
-
-        document.getElementById('timer-display')?.classList.remove('hidden');
-        document.getElementById('end-buttons-full')?.classList.remove('hidden');
-        document.getElementById('end-button-final')?.classList.add('hidden');
+        showBackButton(); // 👈 Affiche la flèche aussi sur page End
       });
     });
   });
 
   // 💤 Snooze
   document.getElementById('btn-snooze')?.addEventListener('click', () => {
-    soundStart.currentTime = 0;
     soundStart.play();
-
-    if (softAlarm) { softAlarm.pause(); softAlarm.currentTime = 0; }
-
+    if (softAlarm) softAlarm.pause();
     document.getElementById('end-buttons-full')?.classList.add('hidden');
     document.getElementById('end-button-final')?.classList.add('hidden');
     document.getElementById('timer-display')?.classList.remove('hidden');
-
     startTimer(120, () => {
       softAlarm = new Audio('sounds/egg-ready.wav');
       softAlarm.volume = 0.6;
-      softAlarm.play().catch(() => {});
+      softAlarm.play().catch(()=>{});
       pageTimer.classList.replace('visible', 'hidden');
       pageEnd.classList.replace('hidden', 'visible');
-      document.getElementById('timer-display')?.classList.add('hidden');
-      document.getElementById('end-buttons-full')?.classList.remove('hidden');
     });
-
     pageEnd.classList.replace('visible', 'hidden');
     pageTimer.classList.replace('hidden', 'visible');
+    showBackButton();
   });
 
   // ⏸️ Pause/Reprendre
@@ -223,9 +170,8 @@ window.addEventListener('DOMContentLoaded', () => {
     try { isPaused ? cookingMusic?.pause() : cookingMusic?.play(); } catch {}
   });
 
-  // 🔄 Reset (revient au début de la session en pause)
+  // 🔄 Reset
   const btnReset = document.getElementById('btn-reset');
-  if (btnReset) btnReset.textContent = '↻';
   btnReset?.addEventListener('click', () => {
     if (currentInterval === null && remainingSeconds <= 0) return;
     remainingSeconds = sessionInitialSeconds;
@@ -237,15 +183,10 @@ window.addEventListener('DOMContentLoaded', () => {
       const s = remainingSeconds % 60;
       timerDisplay.textContent = `${m}:${s.toString().padStart(2, '0')}`;
     }
-    try { cookingMusic?.pause(); if (cookingMusic) cookingMusic.currentTime = 0; } catch {}
+    if (cookingMusic) { cookingMusic.pause(); cookingMusic.currentTime = 0; }
   });
 
-  /* ==============================
-     ⏲️ Modale "durée personnalisée"
-     - Clique sur l'afficheur -> modale
-     - "Appliquer" => met à jour le timer
-     - 🔥 Et enregistre AUTOMATIQUEMENT la durée pour le type courant
-  =============================== */
+  // ⏲️ Modale durée personnalisée
   const modalCustom = document.getElementById('modal-custom-time');
   const inputMin = document.getElementById('custom-min');
   const inputSec = document.getElementById('custom-sec');
@@ -254,15 +195,11 @@ window.addEventListener('DOMContentLoaded', () => {
   const timerDisplayEl = document.getElementById('timer-display');
 
   timerDisplayEl?.addEventListener('click', () => {
-    // Base proposée = temps restant > 0, sinon durée de la session, sinon durée stockée du type, sinon 300s
-    const base =
-      (remainingSeconds > 0) ? remainingSeconds :
-      (sessionInitialSeconds > 0) ? sessionInitialSeconds :
-      (selectedType ? getDurationFor(selectedType) : 300);
-
+    const base = (remainingSeconds > 0) ? remainingSeconds :
+                 (sessionInitialSeconds > 0) ? sessionInitialSeconds :
+                 (selectedType ? getDurationFor(selectedType) : 300);
     inputMin.value = Math.floor(base / 60);
     inputSec.value = Math.floor(base % 60);
-
     modalCustom.classList.remove('hidden');
     modalCustom.setAttribute('aria-hidden', 'false');
     setTimeout(() => inputMin?.focus(), 0);
@@ -280,98 +217,78 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !modalCustom.classList.contains('hidden')) {
-      modalCustom.classList.add('hidden');
-      modalCustom.setAttribute('aria-hidden', 'true');
-    }
-  });
-
   btnApply?.addEventListener('click', () => {
     const m = Math.max(0, parseInt(inputMin.value || '0', 10));
     const s = Math.min(59, Math.max(0, parseInt(inputSec.value || '0', 10)));
     const newSeconds = m * 60 + s;
-
-    // Met à jour la session courante (en pause par défaut)
     sessionInitialSeconds = newSeconds;
     remainingSeconds = sessionInitialSeconds;
     isPaused = true;
-
-    const btnPauseEl = document.getElementById('btn-pause');
-    if (btnPauseEl) btnPauseEl.textContent = '▶';
-
-    if (timerDisplayEl) {
-      timerDisplayEl.textContent = `${m}:${s.toString().padStart(2, '0')}`;
-    }
-
-    // 🔥 Autosave : enregistre pour le type sélectionné
-    if (selectedType) {
-      saveDurationForType(selectedType, newSeconds);
-    }
-
+    if (btnPause) btnPause.textContent = '▶';
+    timerDisplayEl.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+    if (selectedType) saveDurationForType(selectedType, newSeconds);
     modalCustom.classList.add('hidden');
     modalCustom.setAttribute('aria-hidden', 'true');
   });
 
-  // ⌨️ Raccourci espace = Pause/Reprendre
+  // ⌨️ Espace = Pause/Reprendre
   window.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
       e.preventDefault();
       btnPause?.click();
     }
   });
+
+  /* === Gestion flèche retour (#btn-back-menu) === */
+  const btnBackMenu = document.getElementById('btn-back-menu');
+  function showBackButton() { btnBackMenu?.classList.remove('hidden'); }
+  function hideBackButton() { btnBackMenu?.classList.add('hidden'); }
+
+  btnBackMenu?.addEventListener('click', () => {
+    soundClose.currentTime = 0; // 🔊 son clic comme fermer/réduire
+    soundClose.play();
+
+    if (currentInterval) clearInterval(currentInterval);
+    if (cookingMusic) { cookingMusic.pause(); cookingMusic.currentTime = 0; }
+    isPaused = false;
+    remainingSeconds = 0;
+    document.getElementById('page-end')?.classList.replace('visible', 'hidden');
+    document.getElementById('page-timer')?.classList.replace('visible', 'hidden');
+    document.getElementById('page-menu')?.classList.replace('hidden', 'visible');
+    hideBackButton();
+    if (btnPause) btnPause.textContent = '⏸';
+  });
 });
 
-/* ========================= */
-/*   🔘 Fenêtres (Electron)  */
-/* ========================= */
+/* === Fenêtres (Electron) === */
 document.getElementById('btn-close')?.addEventListener('click', () => {
-  soundClose.currentTime = 0;
   soundClose.play();
   try { window.electronAPI.closeWindow(); } catch {}
 });
-
 document.getElementById('btn-minimize')?.addEventListener('click', () => {
-  soundMinimize.currentTime = 0;
   soundMinimize.play();
   try { window.electronAPI.minimizeWindow(); } catch {}
 });
 
-/* ========================= */
-/*      ♻️ Reset App         */
-/* ========================= */
+/* === Reset App === */
 function resetApp() {
   if (cookingMusic) { cookingMusic.pause(); cookingMusic.currentTime = 0; }
   if (softAlarm) { softAlarm.pause(); softAlarm.currentTime = 0; }
-
   const endEgg = document.getElementById('end-egg');
-  if (endEgg) {
-    endEgg.src = '';
-    endEgg.classList.remove('vibrate');
-  }
-
+  if (endEgg) { endEgg.src = ''; endEgg.classList.remove('vibrate'); }
   const timerDisplay = document.getElementById('timer-display');
-  if (timerDisplay) {
-    timerDisplay.textContent = '';
-    timerDisplay.classList.remove('hidden');
-  }
-
+  if (timerDisplay) { timerDisplay.textContent = ''; timerDisplay.classList.remove('hidden'); }
   document.getElementById('end-buttons-full')?.classList.remove('hidden');
   document.getElementById('end-button-final')?.classList.add('hidden');
   document.getElementById('end-text')?.classList.remove('hidden');
-
-  const pageEnd = document.getElementById('page-end');
-  const pageTimer = document.getElementById('page-timer');
-  const pageMenu = document.getElementById('page-menu');
-  const pageStart = document.getElementById('page-start');
-
-  pageEnd?.classList.replace('visible', 'hidden');
-  pageTimer?.classList.replace('visible', 'hidden');
-  pageMenu?.classList.replace('visible', 'hidden');
-  pageStart?.classList.replace('hidden', 'visible');
-
+  document.getElementById('page-end')?.classList.replace('visible', 'hidden');
+  document.getElementById('page-timer')?.classList.replace('visible', 'hidden');
+  document.getElementById('page-menu')?.classList.replace('visible', 'hidden');
+  document.getElementById('page-start')?.classList.replace('hidden', 'visible');
   selectedType = null;
 }
+
+
 
 
 
