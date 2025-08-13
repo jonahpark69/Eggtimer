@@ -10,27 +10,22 @@ let selectedType = null;
 let softAlarm = null;
 
 // ⏱️ Ajouts pour Pause/Reprendre/Reset
-let currentInterval = null;      // id du setInterval actif
-let remainingSeconds = 0;        // temps restant (sec)
-let sessionInitialSeconds = 0;   // durée initiale de la session (sec) -> pour reset
-let isPaused = false;            // état pause
+let currentInterval = null;
+let remainingSeconds = 0;
+let sessionInitialSeconds = 0;
+let isPaused = false;
 
-// ⏱️ Timer (version avec Pause/Reprendre + support reset via sessionInitialSeconds)
+// ⏱️ Timer
 function startTimer(durationInSeconds, onEndCallback) {
-  // reset propre du timer précédent
   if (currentInterval) {
     clearInterval(currentInterval);
     currentInterval = null;
   }
-
   remainingSeconds = durationInSeconds;
-  sessionInitialSeconds = durationInSeconds; // mémorise la durée de cette session
+  sessionInitialSeconds = durationInSeconds;
   isPaused = false;
-
-  // 👉 Icône du bouton au démarrage : PAUSE (⏸)
   const btnPause = document.getElementById('btn-pause');
   if (btnPause) btnPause.textContent = '⏸';
-
   const timerDisplay = document.getElementById('timer-display');
 
   const updateDisplay = () => {
@@ -42,18 +37,14 @@ function startTimer(durationInSeconds, onEndCallback) {
   };
 
   updateDisplay();
-
   currentInterval = setInterval(() => {
-    if (isPaused) return; // ⏸️ fige le compte à rebours si en pause
+    if (isPaused) return;
     remainingSeconds--;
     updateDisplay();
-
     if (remainingSeconds < 0) {
       clearInterval(currentInterval);
       currentInterval = null;
-      if (typeof onEndCallback === 'function') {
-        onEndCallback();
-      }
+      if (typeof onEndCallback === 'function') onEndCallback();
     }
   }, 1000);
 }
@@ -71,13 +62,11 @@ window.addEventListener('DOMContentLoaded', () => {
   btnStart?.addEventListener('click', () => {
     soundStart.currentTime = 0;
     soundStart.play();
-    pageStart.classList.remove('visible');
-    pageStart.classList.add('hidden');
-    pageMenu.classList.remove('hidden');
-    pageMenu.classList.add('visible');
+    pageStart.classList.replace('visible', 'hidden');
+    pageMenu.classList.replace('hidden', 'visible');
   });
 
-  // 🔁 Fermer depuis la page de fin (revenir à la page start)
+  // 🔁 Fermer depuis la page de fin
   document.getElementById('btn-restart-app')?.addEventListener('click', () => {
     soundClose.currentTime = 0;
     soundClose.play();
@@ -86,56 +75,27 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // 🥚 Sélection d'un œuf
   const cuissonOptions = document.querySelectorAll('.egg-option');
-  const dureesCuisson = {
-    coque: 210,
-    mollet: 300,
-    plat: 240,
-    dur: 420
-  };
+  const dureesCuisson = { coque: 210, mollet: 300, plat: 240, dur: 420 };
 
   cuissonOptions.forEach(option => {
     option.addEventListener('click', () => {
       eggClickSound.currentTime = 0;
       eggClickSound.play();
-
       const type = option.id.replace('cuisson-', '');
       selectedType = type;
-
-      if (cookingMusic) {
-        cookingMusic.pause();
-        cookingMusic.currentTime = 0;
-      }
-
+      if (cookingMusic) { cookingMusic.pause(); cookingMusic.currentTime = 0; }
       cookingMusic = new Audio(`sounds/music-${type}.mp3`);
-      cookingMusic.loop = true;
-      cookingMusic.volume = 0.5;
-      cookingMusic.play();
-
+      cookingMusic.loop = true; cookingMusic.volume = 0.5; cookingMusic.play();
       timerEgg.src = `gifs/animation-${type}.gif?${Date.now()}`;
-
-      pageMenu.classList.remove('visible');
-      pageMenu.classList.add('hidden');
-      pageTimer.classList.remove('hidden');
-      pageTimer.classList.add('visible');
-
+      pageMenu.classList.replace('visible', 'hidden');
+      pageTimer.classList.replace('hidden', 'visible');
       startTimer(dureesCuisson[type], () => {
-        if (cookingMusic) {
-          cookingMusic.pause();
-          cookingMusic.currentTime = 0;
-        }
-
-        softAlarm = new Audio('sounds/egg-ready.wav');
-        softAlarm.volume = 0.6;
-        softAlarm.play();
-
+        if (cookingMusic) { cookingMusic.pause(); cookingMusic.currentTime = 0; }
+        softAlarm = new Audio('sounds/egg-ready.wav'); softAlarm.volume = 0.6; softAlarm.play();
         endEgg.src = `img/egg-final-${selectedType}.png?${Date.now()}`;
         endEgg.classList.add('vibrate');
-
-        pageTimer.classList.remove('visible');
-        pageTimer.classList.add('hidden');
-        pageEnd.classList.remove('hidden');
-        pageEnd.classList.add('visible');
-
+        pageTimer.classList.replace('visible', 'hidden');
+        pageEnd.classList.replace('hidden', 'visible');
         document.getElementById('timer-display')?.classList.remove('hidden');
         document.getElementById('end-buttons-full')?.classList.remove('hidden');
         document.getElementById('end-button-final')?.classList.add('hidden');
@@ -147,81 +107,95 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-snooze')?.addEventListener('click', () => {
     soundStart.currentTime = 0;
     soundStart.play();
-
-    if (softAlarm) {
-      softAlarm.pause();
-      softAlarm.currentTime = 0;
-    }
-
+    if (softAlarm) { softAlarm.pause(); softAlarm.currentTime = 0; }
     document.getElementById('end-buttons-full')?.classList.add('hidden');
     document.getElementById('end-button-final')?.classList.add('hidden');
     document.getElementById('timer-display')?.classList.remove('hidden');
-
     startTimer(120, () => {
-      softAlarm = new Audio('sounds/egg-ready.wav');
-      softAlarm.volume = 0.6;
-      softAlarm.play();
-
-      pageTimer.classList.remove('visible');
-      pageTimer.classList.add('hidden');
-      pageEnd.classList.remove('hidden');
-      pageEnd.classList.add('visible');
-
+      softAlarm = new Audio('sounds/egg-ready.wav'); softAlarm.volume = 0.6; softAlarm.play();
+      pageTimer.classList.replace('visible', 'hidden');
+      pageEnd.classList.replace('hidden', 'visible');
       document.getElementById('timer-display')?.classList.add('hidden');
       document.getElementById('end-buttons-full')?.classList.remove('hidden');
     });
-
-    pageEnd.classList.remove('visible');
-    pageEnd.classList.add('hidden');
-    pageTimer.classList.remove('hidden');
-    pageTimer.classList.add('visible');
+    pageEnd.classList.replace('visible', 'hidden');
+    pageTimer.classList.replace('hidden', 'visible');
   });
 
-  // ⏸️ Bouton Pause/Reprendre (icônes uniquement)
+  // ⏸️ Pause/Reprendre
   const btnPause = document.getElementById('btn-pause');
   btnPause?.addEventListener('click', () => {
     isPaused = !isPaused;
     btnPause.textContent = isPaused ? '▶' : '⏸';
-
-    try {
-      if (isPaused) {
-        cookingMusic?.pause();
-      } else {
-        cookingMusic?.play();
-      }
-    } catch {}
+    try { isPaused ? cookingMusic?.pause() : cookingMusic?.play(); } catch {}
   });
 
-  // 🔄 Bouton Reset rapide (icône ↻)
+  // 🔄 Reset
   const btnReset = document.getElementById('btn-reset');
-  if (btnReset) btnReset.textContent = '↻'; // sécurité : s'assure que l’icône est bien utilisée
+  if (btnReset) btnReset.textContent = '↻';
   btnReset?.addEventListener('click', () => {
-    // Rien à faire si pas de session active
     if (currentInterval === null && remainingSeconds <= 0) return;
-
-    // Remet la session à sa durée initiale (cohérent pour cuisson ou snooze)
     remainingSeconds = sessionInitialSeconds;
-
-    // Met en pause après reset (évite de repartir tout seul)
     isPaused = true;
     if (btnPause) btnPause.textContent = '▶';
-
-    // Affiche la nouvelle valeur
     const timerDisplay = document.getElementById('timer-display');
     if (timerDisplay) {
       const m = Math.floor(remainingSeconds / 60);
       const s = remainingSeconds % 60;
       timerDisplay.textContent = `${m}:${s.toString().padStart(2, '0')}`;
     }
-
-    // Stopper/revenir au début de la musique
-    try {
-      cookingMusic?.pause();
-      if (cookingMusic) cookingMusic.currentTime = 0;
-    } catch {}
+    try { cookingMusic?.pause(); if (cookingMusic) cookingMusic.currentTime = 0; } catch {}
   });
 
-  // (optionnel) Raccourci clavier: Espace = Pause/Reprendre
+  // ⏱️ Clic sur le timer → ouvrir la modale
+  const modalCustom = document.getElementById('modal-custom-time');
+  const inputMin = document.getElementById('custom-min');
+  const inputSec = document.getElementById('custom-sec');
+  const btnApply = document.getElementById('custom-apply');
+  const btnCancel = document.getElementById('custom-cancel');
+  const timerDisplayEl = document.getElementById('timer-display');
+
+  timerDisplayEl?.addEventListener('click', () => {
+    const base = (remainingSeconds > 0) ? remainingSeconds : (sessionInitialSeconds || 300);
+    inputMin.value = Math.floor(base / 60);
+    inputSec.value = Math.floor(base % 60);
+    modalCustom.classList.remove('hidden');
+    modalCustom.setAttribute('aria-hidden', 'false');
+    setTimeout(() => inputMin?.focus(), 0);
+  });
+
+  btnCancel?.addEventListener('click', () => {
+    modalCustom.classList.add('hidden');
+    modalCustom.setAttribute('aria-hidden', 'true');
+  });
+
+  modalCustom?.addEventListener('click', (e) => {
+    if (e.target === modalCustom || e.target.classList.contains('modal-backdrop')) {
+      modalCustom.classList.add('hidden');
+      modalCustom.setAttribute('aria-hidden', 'true');
+    }
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modalCustom.classList.contains('hidden')) {
+      modalCustom.classList.add('hidden');
+      modalCustom.setAttribute('aria-hidden', 'true');
+    }
+  });
+
+  btnApply?.addEventListener('click', () => {
+    const m = Math.max(0, parseInt(inputMin.value || '0', 10));
+    const s = Math.min(59, Math.max(0, parseInt(inputSec.value || '0', 10)));
+    sessionInitialSeconds = m * 60 + s;
+    remainingSeconds = sessionInitialSeconds;
+    isPaused = true;
+    if (btnPause) btnPause.textContent = '▶';
+    timerDisplayEl.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+    modalCustom.classList.add('hidden');
+    modalCustom.setAttribute('aria-hidden', 'true');
+  });
+
+  // ⌨️ Raccourci espace = Pause/Reprendre
   window.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
       e.preventDefault();
@@ -230,7 +204,7 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// 🔘 Fenêtres (boutons haut droite)
+// 🔘 Fenêtres
 document.getElementById('btn-close')?.addEventListener('click', () => {
   soundClose.currentTime = 0;
   soundClose.play();
@@ -244,46 +218,26 @@ document.getElementById('btn-minimize')?.addEventListener('click', () => {
 });
 
 function resetApp() {
-  if (cookingMusic) {
-    cookingMusic.pause();
-    cookingMusic.currentTime = 0;
-  }
-  if (softAlarm) {
-    softAlarm.pause();
-    softAlarm.currentTime = 0;
-  }
-
+  if (cookingMusic) { cookingMusic.pause(); cookingMusic.currentTime = 0; }
+  if (softAlarm) { softAlarm.pause(); softAlarm.currentTime = 0; }
   const endEgg = document.getElementById('end-egg');
-  endEgg.src = '';
-  endEgg.classList.remove('vibrate');
-
+  endEgg.src = ''; endEgg.classList.remove('vibrate');
   const timerDisplay = document.getElementById('timer-display');
-  if (timerDisplay) {
-    timerDisplay.textContent = '';
-    timerDisplay.classList.remove('hidden');
-  }
-
+  if (timerDisplay) { timerDisplay.textContent = ''; timerDisplay.classList.remove('hidden'); }
   document.getElementById('end-buttons-full')?.classList.remove('hidden');
   document.getElementById('end-button-final')?.classList.add('hidden');
   document.getElementById('end-text')?.classList.remove('hidden');
-
   const pageEnd = document.getElementById('page-end');
   const pageTimer = document.getElementById('page-timer');
   const pageMenu = document.getElementById('page-menu');
   const pageStart = document.getElementById('page-start');
-
-  pageEnd.classList.remove('visible');
-  pageEnd.classList.add('hidden');
-  pageTimer.classList.remove('visible');
-  pageTimer.classList.add('hidden');
-  pageMenu.classList.remove('visible');
-  pageMenu.classList.add('hidden');
-
-  pageStart.classList.remove('hidden');
-  pageStart.classList.add('visible');
-
+  pageEnd.classList.replace('visible', 'hidden');
+  pageTimer.classList.replace('visible', 'hidden');
+  pageMenu.classList.replace('visible', 'hidden');
+  pageStart.classList.replace('hidden', 'visible');
   selectedType = null;
 }
+
 
 
 

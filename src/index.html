@@ -71,13 +71,28 @@
       <p class="timer-countdown" id="timer-display">7:00</p>
       <button id="btn-reset" type="button" class="reset-btn">⟳</button>
 
+      <!-- 📌 Modale durée personnalisée -->
+      <div id="modal-custom-time" class="modal hidden" aria-hidden="true">
+        <div class="modal-backdrop"></div>
+        <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title-time">
+          <h3 id="modal-title-time">Durée personnalisée</h3>
+          <div class="modal-row">
+            <label for="custom-min">Min</label>
+            <input id="custom-min" type="number" min="0" value="5">
+            <span>:</span>
+            <label for="custom-sec" class="sr-only">Sec</label>
+            <input id="custom-sec" type="number" min="0" max="59" value="0">
+          </div>
+          <div class="modal-actions">
+            <button id="custom-cancel" type="button">Annuler</button>
+            <button id="custom-apply"  type="button">Appliquer</button>
+          </div>
+        </div>
+      </div>
+      <!-- /Modale -->
     </div>
   </div>
 </section>
-
-
-
-
 
 <section id="page-end" class="page hidden">
   <div class="timer-wrapper page-end-wrapper">
