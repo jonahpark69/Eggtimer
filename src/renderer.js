@@ -9,25 +9,46 @@ let cookingMusic = null;
 let selectedType = null;
 let softAlarm = null;
 
-// ⏱️ Timer
+// ⏱️ Ajouts pour Pause/Reprendre
+let currentInterval = null;   // id du setInterval actif
+let remainingSeconds = 0;     // temps restant (sec)
+let isPaused = false;         // état pause
+
+// ⏱️ Timer (version avec Pause/Reprendre)
 function startTimer(durationInSeconds, onEndCallback) {
-  let remainingTime = durationInSeconds;
+  // reset propre du timer précédent
+  if (currentInterval) {
+    clearInterval(currentInterval);
+    currentInterval = null;
+  }
+
+  remainingSeconds = durationInSeconds;
+  isPaused = false;
+
+  // 👉 Icône du bouton au démarrage : PAUSE (⏸)
+  const btnPause = document.getElementById('btn-pause');
+  if (btnPause) btnPause.textContent = '⏸';
+
   const timerDisplay = document.getElementById('timer-display');
 
   const updateDisplay = () => {
-    const minutes = Math.floor(remainingTime / 60);
-    const seconds = remainingTime % 60;
-    timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    const minutes = Math.floor(Math.max(0, remainingSeconds) / 60);
+    const seconds = Math.max(0, remainingSeconds) % 60;
+    if (timerDisplay) {
+      timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
   };
 
   updateDisplay();
 
-  const interval = setInterval(() => {
-    remainingTime--;
+  currentInterval = setInterval(() => {
+    if (isPaused) return; // ⏸️ fige le compte à rebours si en pause
+    remainingSeconds--;
     updateDisplay();
 
-    if (remainingTime < 0) {
-      clearInterval(interval);
+    if (remainingSeconds < 0) {
+      clearInterval(currentInterval);
+      currentInterval = null;
       if (typeof onEndCallback === 'function') {
         onEndCallback();
       }
@@ -120,6 +141,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // 💤 Snooze
   document.getElementById('btn-snooze')?.addEventListener('click', () => {
     soundStart.currentTime = 0;
     soundStart.play();
@@ -151,6 +173,32 @@ window.addEventListener('DOMContentLoaded', () => {
     pageEnd.classList.add('hidden');
     pageTimer.classList.remove('hidden');
     pageTimer.classList.add('visible');
+  });
+
+  // ⏸️ Bouton Pause/Reprendre (icônes uniquement)
+  const btnPause = document.getElementById('btn-pause');
+  btnPause?.addEventListener('click', () => {
+    // bascule l'état
+    isPaused = !isPaused;
+    // feedback visuel par icône
+    btnPause.textContent = isPaused ? '▶' : '⏸';
+
+    // (optionnel) synchroniser la musique
+    try {
+      if (isPaused) {
+        cookingMusic?.pause();
+      } else {
+        cookingMusic?.play();
+      }
+    } catch {}
+  });
+
+  // (optionnel) Raccourci clavier: Espace = Pause/Reprendre
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') {
+      e.preventDefault();
+      btnPause?.click();
+    }
   });
 });
 
@@ -208,6 +256,8 @@ function resetApp() {
 
   selectedType = null;
 }
+
+
 
 
 

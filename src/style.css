@@ -384,5 +384,44 @@ body {
   transform: translateX(-50%) scale(1.1);
 }
 
+.timer-content {
+  position: relative; /* nécessaire pour positionner le bouton en absolu */
+}
+
+.pause-btn {
+  position: absolute;
+  left: calc(50% - 150px); /* ajuste la distance horizontale par rapport au centre */
+  top: 50%; /* alignement vertical */
+  transform: translateY(-50%); /* centre parfaitement verticalement */
+
+  font-family: 'VT323', monospace;
+  color: #fff;
+
+  background-color: #e57c30; /* orange rétro */
+  border: 4px solid #000;
+  border-radius: 4px; /* léger arrondi pixel */
+
+  width: 50px;           /* largeur fixe pour éviter tout décalage */
+  height: 50px;          /* carré */
+  font-size: 24px;       /* taille de l’icône */
+  line-height: 40px;     /* centrer verticalement */
+  text-align: center;    /* centrer horizontalement */
+
+  cursor: pointer;
+  box-shadow: 2px 2px 0 #000; /* ombre pixel */
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.pause-btn:hover {
+  background-color: #f28c3c;
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 3px 3px 0 #000;
+}
+
+.pause-btn:active {
+  background-color: #d86f26;
+  transform: translateY(-50%) scale(0.95);
+  box-shadow: 1px 1px 0 #000;
+}
 
 
