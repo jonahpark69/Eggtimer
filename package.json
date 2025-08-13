@@ -8,12 +8,24 @@
   "keywords": [],
   "scripts": {
     "start": "electron .",
-    "package-win": "electron-packager . EggTimer --platform=win32 --arch=ia32 --overwrite --no-app-version --no-copyright"
+
+    "clean": "rm -rf EggTimer-darwin-* EggTimer-win32-* dist 2>/dev/null || true",
+
+    "package-mac-both": "npx electron-packager . EggTimer --platform=darwin --arch=x64,arm64 --overwrite --icon=icon.icns",
+
+    "make-universal": "npx @electron/universal EggTimer-darwin-x64/EggTimer.app EggTimer-darwin-arm64/EggTimer.app EggTimer-darwin-universal/EggTimer.app",
+
+    "package-mac-universal": "npm run clean && npm run package-mac-both && npm run make-universal",
+
+    "make-dmg": "npx create-dmg 'EggTimer-darwin-universal/EggTimer.app' --overwrite --dmg-title='Egg Timer' --background='background.png' --icon-size=128 --window-pos 200 120 --window-size 600 400 --icon 'EggTimer.app' 150 200 --app-drop-link 450 200 dist",
+
+    "package-mac-universal-dmg": "npm run package-mac-universal && npm run make-dmg"
   },
-  
   "devDependencies": {
+    "@electron/universal": "^1.5.1",
+    "create-dmg": "^5.4.0",
+    "electron": "^30.0.0",
     "electron-packager": "^17.1.2"
   }
 }
-
 
