@@ -9,12 +9,13 @@ let cookingMusic = null;
 let selectedType = null;
 let softAlarm = null;
 
-// ⏱️ Ajouts pour Pause/Reprendre
-let currentInterval = null;   // id du setInterval actif
-let remainingSeconds = 0;     // temps restant (sec)
-let isPaused = false;         // état pause
+// ⏱️ Ajouts pour Pause/Reprendre/Reset
+let currentInterval = null;      // id du setInterval actif
+let remainingSeconds = 0;        // temps restant (sec)
+let sessionInitialSeconds = 0;   // durée initiale de la session (sec) -> pour reset
+let isPaused = false;            // état pause
 
-// ⏱️ Timer (version avec Pause/Reprendre)
+// ⏱️ Timer (version avec Pause/Reprendre + support reset via sessionInitialSeconds)
 function startTimer(durationInSeconds, onEndCallback) {
   // reset propre du timer précédent
   if (currentInterval) {
@@ -23,6 +24,7 @@ function startTimer(durationInSeconds, onEndCallback) {
   }
 
   remainingSeconds = durationInSeconds;
+  sessionInitialSeconds = durationInSeconds; // mémorise la durée de cette session
   isPaused = false;
 
   // 👉 Icône du bouton au démarrage : PAUSE (⏸)
@@ -178,18 +180,44 @@ window.addEventListener('DOMContentLoaded', () => {
   // ⏸️ Bouton Pause/Reprendre (icônes uniquement)
   const btnPause = document.getElementById('btn-pause');
   btnPause?.addEventListener('click', () => {
-    // bascule l'état
     isPaused = !isPaused;
-    // feedback visuel par icône
     btnPause.textContent = isPaused ? '▶' : '⏸';
 
-    // (optionnel) synchroniser la musique
     try {
       if (isPaused) {
         cookingMusic?.pause();
       } else {
         cookingMusic?.play();
       }
+    } catch {}
+  });
+
+  // 🔄 Bouton Reset rapide (icône ↻)
+  const btnReset = document.getElementById('btn-reset');
+  if (btnReset) btnReset.textContent = '↻'; // sécurité : s'assure que l’icône est bien utilisée
+  btnReset?.addEventListener('click', () => {
+    // Rien à faire si pas de session active
+    if (currentInterval === null && remainingSeconds <= 0) return;
+
+    // Remet la session à sa durée initiale (cohérent pour cuisson ou snooze)
+    remainingSeconds = sessionInitialSeconds;
+
+    // Met en pause après reset (évite de repartir tout seul)
+    isPaused = true;
+    if (btnPause) btnPause.textContent = '▶';
+
+    // Affiche la nouvelle valeur
+    const timerDisplay = document.getElementById('timer-display');
+    if (timerDisplay) {
+      const m = Math.floor(remainingSeconds / 60);
+      const s = remainingSeconds % 60;
+      timerDisplay.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+    }
+
+    // Stopper/revenir au début de la musique
+    try {
+      cookingMusic?.pause();
+      if (cookingMusic) cookingMusic.currentTime = 0;
     } catch {}
   });
 
@@ -256,6 +284,8 @@ function resetApp() {
 
   selectedType = null;
 }
+
+
 
 
 
